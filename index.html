@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0b0f14">
+
+<!-- iOS-specific tags (iOS ignores manifest.json in some respects) -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="InvestAI">
+<link rel="apple-touch-icon" href="/icons/icon-192.png">
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>InvestAI — Your AI-Powered Investment Guide</title>
@@ -651,6 +659,15 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
     if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}
   });
 });
+</script>
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log('Service worker registered'))
+        .catch((err) => console.error('SW registration failed:', err));
+    });
+  }
 </script>
 </body>
 </html>
