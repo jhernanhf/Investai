@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>InvestAI — Your AI-Powered Investment Guide</title>
+<meta name="description" content="Personalized investment guidance, an AI coaching chatbot, portfolio tracking, and interactive learning — all in one place."/>
+<style>
+:root{
+  --bg:#060911;
+  --panel:#10172c;
+  --border:#1e2840;
+  --border-bright:#2e3d5c;
+  --text:#eef1f8;
+  --muted:#8892a8;
+  --muted2:#5c6880;
+  --gold:#c9a84c;
+  --gold2:#f0d080;
+  --green:#18b07a;
+  --blue:#5a9cf5;
+  --red:#e84545;
+  --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Georgia,serif;
+  --sans:Inter,-apple-system,"Segoe UI",Arial,sans-serif;
+  --radius:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:var(--sans);
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ── TICKER TAPE ── */
+.ticker-wrap{
+  width:100%;overflow:hidden;
+  background:rgba(201,168,76,.06);
+  border-bottom:1px solid rgba(201,168,76,.15);
+  padding:9px 0;
+  position:relative;
+  z-index:2;
+}
+.ticker-track{
+  display:flex;gap:0;
+  white-space:nowrap;
+  animation:ticker 40s linear infinite;
+}
+.ticker-wrap:hover .ticker-track{animation-play-state:paused}
+@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.tick{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:0 28px;font-size:12.5px;font-weight:600;letter-spacing:.03em;
+  border-right:1px solid rgba(201,168,76,.12);
+}
+.tick-sym{color:var(--gold2)}
+.tick-up{color:var(--green)}
+.tick-dn{color:var(--red)}
+
+/* ── HEADER ── */
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:16px 48px;
+  position:sticky;top:0;z-index:10;
+  background:rgba(6,9,17,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-icon{width:34px;height:34px;flex-shrink:0}
+.brand-name{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--gold2);letter-spacing:.025em}
+.header-cta{
+  display:inline-flex;align-items:center;gap:7px;
+  background:linear-gradient(135deg,var(--gold),#9a6b1e);
+  color:#07100a;border:0;border-radius:999px;
+  padding:9px 20px;font-size:13.5px;font-weight:800;
+  cursor:pointer;text-decoration:none;
+  transition:filter .18s,transform .18s;
+  font-family:var(--sans);
+}
+.header-cta:hover{filter:brightness(1.1);transform:translateY(-1px);text-decoration:none}
+
+/* ── HERO ── */
+.hero{
+  position:relative;
+  padding:100px 48px 80px;
+  text-align:center;
+  overflow:hidden;
+  background:
+    radial-gradient(ellipse at 10% 0%,rgba(201,168,76,.16),transparent 45%),
+    radial-gradient(ellipse at 90% 10%,rgba(90,156,245,.10),transparent 45%),
+    radial-gradient(ellipse at 50% 100%,rgba(24,176,122,.07),transparent 55%);
+}
+.hero-canvas{
+  position:absolute;inset:0;pointer-events:none;opacity:.35;
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:7px;
+  background:rgba(201,168,76,.09);border:1px solid rgba(201,168,76,.25);
+  border-radius:999px;padding:6px 14px;
+  font-size:12px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--gold2);
+  margin-bottom:24px;
+}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--gold2);animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(1.5)}}
+.hero h1{
+  font-family:var(--serif);
+  font-size:clamp(36px,6vw,72px);
+  line-height:1.1;
+  letter-spacing:-.01em;
+  max-width:820px;margin:0 auto;
+}
+.hero h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,var(--gold2),var(--gold));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{
+  margin:20px auto 0;
+  max-width:560px;
+  font-size:17px;line-height:1.65;color:var(--muted);
+}
+.hero-actions{
+  display:flex;align-items:center;justify-content:center;gap:14px;
+  margin-top:36px;flex-wrap:wrap;
+}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,var(--gold),#9a6b1e);
+  color:#07100a;border:0;border-radius:999px;
+  padding:14px 32px;font-size:15px;font-weight:800;
+  cursor:pointer;text-decoration:none;
+  transition:filter .18s,transform .18s,box-shadow .18s;
+  font-family:var(--sans);
+  box-shadow:0 8px 28px rgba(201,168,76,.28);
+}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 14px 36px rgba(201,168,76,.38);text-decoration:none}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:7px;
+  background:transparent;color:var(--muted);
+  border:1px solid var(--border-bright);border-radius:999px;
+  padding:13px 26px;font-size:14px;font-weight:600;
+  cursor:pointer;text-decoration:none;
+  transition:border-color .18s,color .18s,background .18s;
+  font-family:var(--sans);
+}
+.btn-ghost:hover{border-color:rgba(201,168,76,.4);color:var(--gold2);background:rgba(201,168,76,.06);text-decoration:none}
+
+/* ── STAT BAR ── */
+.stat-bar{
+  display:flex;justify-content:center;gap:0;flex-wrap:wrap;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  background:rgba(10,16,32,.5);
+  margin-top:64px;
+}
+.stat{
+  padding:22px 40px;text-align:center;
+  border-right:1px solid var(--border);flex:1;min-width:140px;
+}
+.stat:last-child{border-right:0}
+.stat-val{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--gold2)}
+.stat-lbl{font-size:12px;color:var(--muted2);margin-top:3px;letter-spacing:.04em;text-transform:uppercase}
+
+/* ── FEATURES ── */
+.section{padding:80px 48px}
+.section-label{
+  text-align:center;font-size:11.5px;font-weight:700;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--gold);margin-bottom:14px;
+}
+.section-title{
+  text-align:center;font-family:var(--serif);
+  font-size:clamp(26px,4vw,42px);line-height:1.2;margin-bottom:14px;
+}
+.section-sub{text-align:center;color:var(--muted);font-size:16px;max-width:540px;margin:0 auto 52px}
+
+.features{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;max-width:1100px;margin:0 auto;
+}
+.feat{
+  background:linear-gradient(160deg,#121b34,#0b1226);
+  border:1px solid var(--border);border-radius:18px;
+  padding:30px 28px;
+  transition:border-color .2s,transform .2s,box-shadow .2s;
+  position:relative;overflow:hidden;
+}
+.feat::before{
+  content:'';position:absolute;inset:0;border-radius:18px;
+  background:radial-gradient(ellipse at 0% 0%,rgba(201,168,76,.08),transparent 60%);
+  opacity:0;transition:opacity .3s;
+}
+.feat:hover{border-color:rgba(201,168,76,.3);transform:translateY(-4px);box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.feat:hover::before{opacity:1}
+.feat-icon{
+  width:48px;height:48px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;margin-bottom:18px;
+  background:rgba(201,168,76,.1);border:1px solid rgba(201,168,76,.2);
+}
+.feat-icon.green{background:rgba(24,176,122,.1);border-color:rgba(24,176,122,.2)}
+.feat-icon.blue{background:rgba(90,156,245,.1);border-color:rgba(90,156,245,.2)}
+.feat-icon.purple{background:rgba(168,138,240,.1);border-color:rgba(168,138,240,.2)}
+.feat h3{font-family:var(--serif);font-size:19px;margin-bottom:9px;color:var(--text)}
+.feat p{font-size:14px;color:var(--muted);line-height:1.65}
+.feat-tag{
+  display:inline-block;margin-top:14px;
+  font-size:11.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:var(--gold2);opacity:.7;
+}
+
+/* ── HOW IT WORKS ── */
+.how-section{
+  padding:80px 48px;
+  background:rgba(10,16,32,.4);
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.steps{
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:32px;max-width:900px;margin:0 auto;
+}
+.step{text-align:center;padding:0 12px}
+.step-num{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,rgba(201,168,76,.2),rgba(90,156,245,.1));
+  border:1px solid rgba(201,168,76,.35);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:18px;font-weight:700;color:var(--gold2);
+  margin:0 auto 16px;
+}
+.step h4{font-family:var(--serif);font-size:16px;margin-bottom:7px}
+.step p{font-size:13.5px;color:var(--muted);line-height:1.6}
+
+/* ── DASHBOARD PREVIEW ── */
+.preview-section{padding:80px 48px;text-align:center}
+.preview-frame{
+  max-width:960px;margin:0 auto;
+  border:1px solid var(--border-bright);border-radius:20px;
+  overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.7);
+  background:linear-gradient(180deg,#0b1226,#060911);
+  position:relative;
+}
+.preview-bar{
+  display:flex;align-items:center;gap:7px;
+  padding:12px 16px;background:rgba(255,255,255,.04);
+  border-bottom:1px solid var(--border);
+}
+.preview-dot{width:11px;height:11px;border-radius:50%}
+.preview-inner{padding:28px 24px}
+.preview-nav{
+  display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;
+}
+.pnav-item{
+  padding:6px 14px;border-radius:8px;font-size:12.5px;font-weight:600;
+  border:1px solid var(--border);color:var(--muted);
+}
+.pnav-item.pa{
+  border-color:rgba(201,168,76,.45);
+  background:linear-gradient(135deg,rgba(201,168,76,.16),rgba(90,156,245,.08));
+  color:var(--gold2);
+}
+.preview-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
+.pc{
+  background:linear-gradient(160deg,#121b34,#0b1226);
+  border:1px solid var(--border);border-radius:12px;padding:16px;
+}
+.pc-lbl{font-size:11px;color:var(--muted2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.pc-val{font-family:var(--serif);font-size:20px;font-weight:700}
+.pc-val.up{color:var(--green)}
+.pc-val.gold{color:var(--gold2)}
+.pc-val.blue{color:var(--blue)}
+.preview-chart{
+  background:linear-gradient(160deg,#0e1728,#08101f);
+  border:1px solid var(--border);border-radius:12px;padding:20px 16px;
+  position:relative;height:100px;overflow:hidden;
+}
+.preview-chart svg{width:100%;height:100%}
+
+/* ── DISCLAIMER ── */
+.disclaimer-section{
+  padding:32px 48px;
+  background:rgba(6,9,17,.6);
+  border-top:1px solid var(--border);
+  text-align:center;
+}
+.disclaimer-section p{font-size:12px;color:var(--muted2);line-height:1.7;max-width:700px;margin:0 auto}
+
+/* ── FOOTER ── */
+footer{
+  padding:32px 48px;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:12px;
+  background:rgba(6,9,17,.8);
+}
+.footer-brand{display:flex;align-items:center;gap:10px}
+.footer-brand-name{font-family:var(--serif);font-weight:700;font-size:15px;color:var(--gold2)}
+footer p{font-size:12.5px;color:var(--muted2)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:640px){
+  header{padding:14px 20px}
+  .hero{padding:64px 20px 52px}
+  .section,.how-section,.preview-section,.disclaimer-section{padding:52px 20px}
+  .stat{padding:18px 20px}
+  footer{padding:24px 20px;flex-direction:column;align-items:flex-start}
+  .preview-cards{grid-template-columns:1fr 1fr}
+  .preview-cards .pc:last-child{display:none}
+}
+@media(prefers-reduced-motion:reduce){
+  .ticker-track{animation:none}
+  .pulse{animation:none}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- ── TICKER ── -->
+<div class="ticker-wrap" aria-hidden="true">
+  <div class="ticker-track" id="tickerTrack">
+    <!-- duplicated for seamless loop, populated by JS -->
+  </div>
+</div>
+
+<!-- ── HEADER ── -->
+<header>
+  <div class="brand">
+    <svg class="brand-icon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" stroke="#c9a84c" stroke-width="4" fill="none"/>
+      <rect x="28" y="54" width="11" height="17" rx="2" fill="#c9a84c"/>
+      <rect x="45" y="43" width="11" height="28" rx="2" fill="#c9a84c"/>
+      <rect x="62" y="32" width="11" height="39" rx="2" fill="#c9a84c"/>
+      <polyline points="31,40 50,29 70,20" fill="none" stroke="#18b07a" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <div class="brand-name">InvestAI</div>
+    </div>
+  </div>
+  <a href="investai_multiuser%20(5).html" class="header-cta">Open Dashboard →</a>
+</header>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <canvas class="hero-canvas" id="heroCanvas"></canvas>
+
+  <div class="hero-eyebrow">
+    <span class="pulse"></span>
+    AI-Powered · Free to Use · No Experience Required
+  </div>
+
+  <h1>Invest smarter.<br/><em>Learn as you grow.</em></h1>
+
+  <p class="hero-sub">
+    Personalized recommendations, a real-time AI coach, portfolio tracking,
+    and bite-sized lessons — everything a first-time investor needs in one place.
+  </p>
+
+  <div class="hero-actions">
+    <a href="investai_multiuser%20(5).html" class="btn-primary">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Get started free
+    </a>
+    <a href="#features" class="btn-ghost">See what's inside ↓</a>
+  </div>
+
+  <div class="stat-bar">
+    <div class="stat">
+      <div class="stat-val">5</div>
+      <div class="stat-lbl">Investor profiles</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">6</div>
+      <div class="stat-lbl">Learning modules</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">AI</div>
+      <div class="stat-lbl">Personal coach</div>
+    </div>
+    <div class="stat">
+      <div class="stat-val">Free</div>
+      <div class="stat-lbl">Always</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="section" id="features">
+  <div class="section-label">What's inside</div>
+  <h2 class="section-title">Built for people who are new to investing</h2>
+  <p class="section-sub">No jargon. No noise. Just tools that make investing feel less intimidating.</p>
+
+  <div class="features">
+    <div class="feat">
+      <div class="feat-icon">📊</div>
+      <h3>Personalised recommendations</h3>
+      <p>Take a short risk quiz and get a tailored portfolio strategy — from conservative bonds to aggressive growth — with plain-English explanations of every suggestion.</p>
+      <span class="feat-tag">For You tab</span>
+    </div>
+    <div class="feat">
+      <div class="feat-icon green">💬</div>
+      <h3>AI Investment Coach</h3>
+      <p>Ask anything — "What's a dividend?" or "Should I rebalance?" — and get clear, unbiased answers from an AI that knows your profile and portfolio context.</p>
+      <span class="feat-tag">AI Coach tab</span>
+    </div>
+    <div class="feat">
+      <div class="feat-icon blue">📈</div>
+      <h3>Portfolio tracker</h3>
+      <p>Add your holdings, track performance over time, and benchmark against the S&P 500. See allocation breakdowns, risk metrics, and what's driving your returns.</p>
+      <span class="feat-tag">Portfolio tab</span>
+    </div>
+    <div class="feat">
+      <div class="feat-icon">👁</div>
+      <h3>Watchlist & news</h3>
+      <p>Follow stocks and ETFs that interest you. Get price data and headlines pulled together in one place so you stay informed without drowning in information.</p>
+      <span class="feat-tag">Watchlist tab</span>
+    </div>
+    <div class="feat">
+      <div class="feat-icon purple">🎓</div>
+      <h3>Learning modules</h3>
+      <p>Six interactive lessons covering the essentials — asset types, diversification, risk, compounding, and more — each with a short quiz to test what you've learned.</p>
+      <span class="feat-tag">Learn tab</span>
+    </div>
+    <div class="feat">
+      <div class="feat-icon green">🔒</div>
+      <h3>Private & per-user</h3>
+      <p>Create your own account. Your portfolio, chat history, learn progress, and profile are stored separately from every other user — and never sent to a server.</p>
+      <span class="feat-tag">Account tab</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── HOW IT WORKS ── -->
+<section class="how-section">
+  <div class="section-label">How it works</div>
+  <h2 class="section-title">Up and running in minutes</h2>
+  <p class="section-sub" style="margin-bottom:48px">No downloads. No credit card. Just open the dashboard and go.</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h4>Create your account</h4>
+      <p>Pick a username and password. Your data is saved in your browser, privately and separately from anyone else.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h4>Take the risk quiz</h4>
+      <p>Five quick questions about your goals, timeline, and comfort with risk. Takes under two minutes.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h4>Get your strategy</h4>
+      <p>Receive a personalised investor profile and portfolio recommendations explained in plain English.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h4>Learn & explore</h4>
+      <p>Work through the learning modules, track paper holdings, and ask the AI Coach anything you're curious about.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── DASHBOARD PREVIEW ── -->
+<section class="preview-section">
+  <div class="section-label">Dashboard preview</div>
+  <h2 class="section-title">A look inside</h2>
+  <p class="section-sub" style="margin-bottom:40px">Everything lives in one clean, dark interface.</p>
+
+  <div class="preview-frame">
+    <div class="preview-bar">
+      <div class="preview-dot" style="background:#e84545"></div>
+      <div class="preview-dot" style="background:#e89c2e"></div>
+      <div class="preview-dot" style="background:#18b07a"></div>
+      <span style="margin-left:10px;font-size:12px;color:#5c6880">InvestAI Dashboard · For You</span>
+    </div>
+    <div class="preview-inner">
+      <div class="preview-nav">
+        <div class="pnav-item pa">For You</div>
+        <div class="pnav-item">Portfolio</div>
+        <div class="pnav-item">Watchlist</div>
+        <div class="pnav-item">AI Coach</div>
+        <div class="pnav-item">Learn</div>
+        <div class="pnav-item">Account</div>
+      </div>
+      <div class="preview-cards">
+        <div class="pc">
+          <div class="pc-lbl">Investor type</div>
+          <div class="pc-val gold">Balanced Builder</div>
+        </div>
+        <div class="pc">
+          <div class="pc-lbl">Portfolio value</div>
+          <div class="pc-val up">$12,840</div>
+        </div>
+        <div class="pc">
+          <div class="pc-lbl">Learn progress</div>
+          <div class="pc-val blue">4 / 6</div>
+        </div>
+      </div>
+      <div class="preview-chart">
+        <svg viewBox="0 0 800 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#c9a84c" stop-opacity=".25"/>
+              <stop offset="100%" stop-color="#c9a84c" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+          <path d="M0,60 C60,58 90,55 130,50 S200,38 240,32 S310,28 360,22 S430,18 480,15 S560,12 610,10 S700,8 800,5" fill="none" stroke="#c9a84c" stroke-width="2.5" stroke-linecap="round"/>
+          <path d="M0,60 C60,58 90,55 130,50 S200,38 240,32 S310,28 360,22 S430,18 480,15 S560,12 610,10 S700,8 800,5 V80 H0 Z" fill="url(#lg)"/>
+          <path d="M0,65 C70,64 120,60 170,56 S260,52 320,50 S400,48 460,46 S540,43 600,41 S700,39 800,37" fill="none" stroke="#5a9cf5" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="4,3"/>
+        </svg>
+        <div style="position:absolute;top:10px;left:16px;font-size:11px;color:#8892a8">Portfolio vs S&P 500 benchmark</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CTA ── -->
+<section style="padding:80px 48px;text-align:center;background:radial-gradient(ellipse at 50% 50%,rgba(201,168,76,.07),transparent 70%)">
+  <div class="hero-eyebrow" style="margin:0 auto 24px">
+    <span class="pulse"></span>
+    Free · No signup required to explore
+  </div>
+  <h2 style="font-family:var(--serif);font-size:clamp(28px,4vw,46px);line-height:1.2;margin-bottom:16px">
+    Ready to start investing<br/>with confidence?
+  </h2>
+  <p style="color:var(--muted);font-size:16px;max-width:440px;margin:0 auto 32px;line-height:1.65">
+    Create your account in seconds and get a personalised investment strategy tailored to your goals.
+  </p>
+  <a href="investai_multiuser%20(5).html" class="btn-primary" style="font-size:16px;padding:16px 36px">
+    Open the dashboard →
+  </a>
+</section>
+
+<!-- ── DISCLAIMER ── -->
+<div class="disclaimer-section">
+  <p>
+    <strong style="color:var(--muted)">Disclaimer:</strong> InvestAI is an educational tool and does not constitute financial advice.
+    Nothing on this platform should be taken as a recommendation to buy or sell any security.
+    Past performance is not indicative of future results. Always consult a qualified financial adviser before making investment decisions.
+    All data is stored locally in your browser — no information is transmitted to any server.
+  </p>
+</div>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-brand">
+    <svg width="26" height="26" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="50" cy="50" r="45" stroke="#c9a84c" stroke-width="5" fill="none"/>
+      <rect x="30" y="56" width="10" height="15" rx="2" fill="#c9a84c"/>
+      <rect x="46" y="45" width="10" height="26" rx="2" fill="#c9a84c"/>
+      <rect x="62" y="34" width="10" height="37" rx="2" fill="#c9a84c"/>
+      <polyline points="33,42 50,31 70,22" fill="none" stroke="#18b07a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="footer-brand-name">InvestAI</div>
+  </div>
+  <p>© 2026 InvestAI · Educational demo · Data stays in your browser</p>
+</footer>
+
+<script>
+// ── TICKER ──
+const ticks=[
+  {sym:'VOO',val:'+1.24%',up:true},{sym:'AAPL',val:'+0.83%',up:true},
+  {sym:'MSFT',val:'+1.10%',up:true},{sym:'NVDA',val:'+2.31%',up:true},
+  {sym:'BND',val:'-0.12%',up:false},{sym:'QQQ',val:'+1.57%',up:true},
+  {sym:'AMZN',val:'+0.69%',up:true},{sym:'TSLA',val:'-0.94%',up:false},
+  {sym:'VTI',val:'+0.97%',up:true},{sym:'SGOV',val:'+0.02%',up:true},
+  {sym:'GOOGL',val:'+0.51%',up:true},{sym:'META',val:'+1.44%',up:true},
+  {sym:'SPY',val:'+0.88%',up:true},{sym:'JPM',val:'-0.33%',up:false},
+  {sym:'GLD',val:'+0.19%',up:true},{sym:'BRK.B',val:'+0.42%',up:true},
+];
+function buildTicker(){
+  const track=document.getElementById('tickerTrack');
+  if(!track)return;
+  const doubled=[...ticks,...ticks]; // seamless loop
+  track.innerHTML=doubled.map(t=>`
+    <span class="tick">
+      <span class="tick-sym">${t.sym}</span>
+      <span class="${t.up?'tick-up':'tick-dn'}">${t.val}</span>
+    </span>
+  `).join('');
+  // Measure one set width and set animation
+  const oneWidth=track.scrollWidth/2;
+  track.style.setProperty('--one-width',oneWidth+'px');
+  // Re-set keyframe via style tag for exact pixel offset
+  let st=document.getElementById('ticker-kf');
+  if(!st){st=document.createElement('style');st.id='ticker-kf';document.head.appendChild(st)}
+  st.textContent=`@keyframes ticker{0%{transform:translateX(0)}100%{transform:translateX(-${oneWidth}px)}}`;
+}
+buildTicker();
+
+// ── HERO CANVAS ── animated drifting chart lines
+(function(){
+  const canvas=document.getElementById('heroCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  let W,H,lines=[];
+
+  function resize(){
+    W=canvas.width=canvas.offsetWidth;
+    H=canvas.height=canvas.offsetHeight;
+    initLines();
+  }
+
+  function initLines(){
+    lines=[];
+    const count=5;
+    const colors=['rgba(201,168,76,','rgba(90,156,245,','rgba(24,176,122,','rgba(168,138,240,','rgba(201,168,76,'];
+    for(let i=0;i<count;i++){
+      const pts=[];
+      const y0=H*(0.2+i*0.15);
+      for(let x=0;x<=W+80;x+=60){
+        pts.push({x,y:y0+Math.random()*40-20});
+      }
+      lines.push({pts,color:colors[i%colors.length],opacity:0.12+i*0.04,speed:0.18+i*0.06,offset:0});
+    }
+  }
+
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    const t=performance.now()/1000;
+    lines.forEach((l,li)=>{
+      // Drift the line slightly over time
+      const pts=l.pts.map((p,i)=>({
+        x:p.x,
+        y:p.y+Math.sin(t*l.speed+i*0.7+li)*8
+      }));
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x,pts[0].y);
+      for(let i=1;i<pts.length-1;i++){
+        const mx=(pts[i].x+pts[i+1].x)/2;
+        const my=(pts[i].y+pts[i+1].y)/2;
+        ctx.quadraticCurveTo(pts[i].x,pts[i].y,mx,my);
+      }
+      ctx.strokeStyle=l.color+l.opacity+')';
+      ctx.lineWidth=1.5;
+      ctx.stroke();
+    });
+    requestAnimationFrame(draw);
+  }
+
+  window.addEventListener('resize',resize);
+  resize();
+  draw();
+})();
+
+// ── SMOOTH SCROLL for anchor links ──
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth',block:'start'})}
+  });
+});
+</script>
+</body>
+</html>
